@@ -20,7 +20,7 @@ func main() {
 	mux := runtime.NewServeMux()
 	dest := conf.Global.GetString("service.dest")
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := pb.RegisterEchoServiceHandlerFromEndpoint(ctx, mux, dest, opts)
+	err := pb.RegisterEchoHandlerFromEndpoint(ctx, mux, dest, opts)
 	if err != nil {
 		log.Fatal("register grpc failed", zap.Error(err))
 		return
