@@ -1,0 +1,17 @@
+syntax = "proto3";
+package pb;
+option go_package = "github.com/tinysrc/z9go/examples/echo/pb";
+
+import "google/api/annotations.proto";
+
+message StringMessage {
+    string value = 1;
+}
+
+service EchoService {
+    rpc Echo(StringMessage) returns (StringMessage) {
+        option (google.api.http) = {
+            get: "/echo"
+        };
+    }
+}

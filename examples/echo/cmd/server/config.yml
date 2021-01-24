@@ -1,0 +1,3 @@
+service:
+  name: "echo.service"
+  addr: ":9001"

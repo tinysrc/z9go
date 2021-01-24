@@ -1,0 +1,2 @@
+service:
+  addr: ":9001"

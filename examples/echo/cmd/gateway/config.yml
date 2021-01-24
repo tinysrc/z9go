@@ -1,0 +1,4 @@
+service:
+  name: "echo"
+  addr: ":8001"
+  dest: ":9001"
