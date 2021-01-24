@@ -6,7 +6,7 @@
   },
   "tags": [
     {
-      "name": "EchoService"
+      "name": "Echo"
     }
   ],
   "consumes": [
@@ -18,7 +18,7 @@
   "paths": {
     "/echo": {
       "get": {
-        "operationId": "EchoService_Echo",
+        "operationId": "Echo_Echo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -42,7 +42,7 @@
           }
         ],
         "tags": [
-          "EchoService"
+          "Echo"
         ]
       }
     }

@@ -32,17 +32,17 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_EchoService_Echo_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_Echo_Echo_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_EchoService_Echo_0(ctx context.Context, marshaler runtime.Marshaler, client EchoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Echo_Echo_0(ctx context.Context, marshaler runtime.Marshaler, client EchoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq StringMessage
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EchoService_Echo_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Echo_Echo_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -51,14 +51,14 @@ func request_EchoService_Echo_0(ctx context.Context, marshaler runtime.Marshaler
 
 }
 
-func local_request_EchoService_Echo_0(ctx context.Context, marshaler runtime.Marshaler, server EchoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_Echo_Echo_0(ctx context.Context, marshaler runtime.Marshaler, server EchoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq StringMessage
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EchoService_Echo_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Echo_Echo_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -67,24 +67,24 @@ func local_request_EchoService_Echo_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-// RegisterEchoServiceHandlerServer registers the http handlers for service EchoService to "mux".
-// UnaryRPC     :call EchoServiceServer directly.
+// RegisterEchoHandlerServer registers the http handlers for service Echo to "mux".
+// UnaryRPC     :call EchoServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEchoServiceHandlerFromEndpoint instead.
-func RegisterEchoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EchoServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEchoHandlerFromEndpoint instead.
+func RegisterEchoHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EchoServer) error {
 
-	mux.Handle("GET", pattern_EchoService_Echo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Echo_Echo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.EchoService/Echo")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Echo/Echo")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_EchoService_Echo_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Echo_Echo_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -92,16 +92,16 @@ func RegisterEchoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-		forward_EchoService_Echo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Echo_Echo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterEchoServiceHandlerFromEndpoint is same as RegisterEchoServiceHandler but
+// RegisterEchoHandlerFromEndpoint is same as RegisterEchoHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterEchoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterEchoHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -121,39 +121,39 @@ func RegisterEchoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.Se
 		}()
 	}()
 
-	return RegisterEchoServiceHandler(ctx, mux, conn)
+	return RegisterEchoHandler(ctx, mux, conn)
 }
 
-// RegisterEchoServiceHandler registers the http handlers for service EchoService to "mux".
+// RegisterEchoHandler registers the http handlers for service Echo to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterEchoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterEchoServiceHandlerClient(ctx, mux, NewEchoServiceClient(conn))
+func RegisterEchoHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterEchoHandlerClient(ctx, mux, NewEchoClient(conn))
 }
 
-// RegisterEchoServiceHandlerClient registers the http handlers for service EchoService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EchoServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EchoServiceClient"
+// RegisterEchoHandlerClient registers the http handlers for service Echo
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EchoClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EchoClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "EchoServiceClient" to call the correct interceptors.
-func RegisterEchoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EchoServiceClient) error {
+// "EchoClient" to call the correct interceptors.
+func RegisterEchoHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EchoClient) error {
 
-	mux.Handle("GET", pattern_EchoService_Echo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Echo_Echo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.EchoService/Echo")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Echo/Echo")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_EchoService_Echo_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Echo_Echo_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_EchoService_Echo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Echo_Echo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -161,9 +161,9 @@ func RegisterEchoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_EchoService_Echo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"echo"}, ""))
+	pattern_Echo_Echo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"echo"}, ""))
 )
 
 var (
-	forward_EchoService_Echo_0 = runtime.ForwardResponseMessage
+	forward_Echo_Echo_0 = runtime.ForwardResponseMessage
 )

@@ -17,5 +17,6 @@ func init() {
 	Global.AddConfigPath("./")
 	Global.ReadInConfig()
 	Global.SetDefault("service.name", "z9")
-	Global.SetDefault("service.addr", ":80")
+	Global.SetDefault("service.addr", ":8080")
+	Global.SetDefault("service.gateway", "localhost:80")
 }
