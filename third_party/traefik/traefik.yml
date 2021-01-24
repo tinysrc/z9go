@@ -1,0 +1,8 @@
+entryPoints:
+  web:
+    address: ":80"
+providers:
+  file:
+    directory: "./conf"
+api:
+  insecure: true

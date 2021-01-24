@@ -1,0 +1,21 @@
+http:
+  routers:
+    to-echo:
+      rule: Path(`/echo`)
+      service: echo
+      entryPoints:
+        - web
+    to-echo-grpc:
+      rule: Path(`/echo.grpc`)
+      service: echo-grpc
+      entryPoints:
+        - web
+  services:
+    echo:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8001
+    echo-grpc:
+      loadBalancer:
+        servers:
+          - url: h2c://127.0.0.1:9001
