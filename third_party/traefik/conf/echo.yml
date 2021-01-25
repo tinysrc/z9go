@@ -5,17 +5,19 @@ http:
       service: echo
       entryPoints:
         - web
-    to-echo-grpc:
-      rule: Path(`/echo.grpc`)
-      service: echo-grpc
+      priority: 1
+    to-echo2:
+      rule: Headers(`Z9-Srv`, `echo`)
+      service: echo2
       entryPoints:
         - web
+      priority: 2
   services:
     echo:
       loadBalancer:
         servers:
           - url: http://127.0.0.1:8001
-    echo-grpc:
+    echo2:
       loadBalancer:
         servers:
           - url: h2c://127.0.0.1:9001
