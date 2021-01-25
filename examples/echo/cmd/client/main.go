@@ -17,9 +17,9 @@ func main() {
 		return
 	}
 	defer conn.Close()
-	impl := pb.NewEchoClient(conn)
+	echoService := pb.NewEchoServiceClient(conn)
 	for i := 0; i < 10; i++ {
-		out, err := impl.Echo(cli.NewCallCtx(), &pb.StringMessage{Value: strconv.Itoa(i)})
+		out, err := echoService.Echo(cli.NewCallCtx(), &pb.StringMessage{Value: strconv.Itoa(i)})
 		if err != nil {
 			log.Error("call echo failed", zap.Error(err))
 		} else {

@@ -10,7 +10,7 @@ import (
 )
 
 type service struct {
-	pb.UnimplementedEchoServer
+	pb.UnimplementedEchoServiceServer
 }
 
 func (s *service) Echo(ctx context.Context, in *pb.StringMessage) (*pb.StringMessage, error) {
@@ -21,6 +21,6 @@ func (s *service) Echo(ctx context.Context, in *pb.StringMessage) (*pb.StringMes
 func main() {
 	defer log.Close()
 	s := srv.NewServer()
-	pb.RegisterEchoServer(s.Server, &service{})
+	pb.RegisterEchoServiceServer(s.Server, &service{})
 	s.Run()
 }
