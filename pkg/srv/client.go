@@ -1,4 +1,4 @@
-package svr
+package srv
 
 import (
 	"context"

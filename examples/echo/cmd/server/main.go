@@ -5,7 +5,7 @@ import (
 
 	"github.com/tinysrc/z9go/examples/echo/pb"
 	"github.com/tinysrc/z9go/pkg/log"
-	"github.com/tinysrc/z9go/pkg/svr"
+	"github.com/tinysrc/z9go/pkg/srv"
 	"go.uber.org/zap"
 )
 
@@ -20,7 +20,7 @@ func (s *service) Echo(ctx context.Context, in *pb.StringMessage) (*pb.StringMes
 
 func main() {
 	defer log.Close()
-	s := svr.NewServer()
+	s := srv.NewServer()
 	pb.RegisterEchoServer(s.Server, &service{})
 	s.Run()
 }
