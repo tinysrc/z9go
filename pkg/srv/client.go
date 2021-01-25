@@ -14,7 +14,7 @@ import (
 // Client struct
 type Client struct {
 	handlers []grpc.UnaryClientInterceptor
-	Conn     *grpc.ClientConn
+	conn     *grpc.ClientConn
 	md       metadata.MD
 }
 
@@ -62,7 +62,7 @@ func (c *Client) Dial(target string) (conn *grpc.ClientConn, err error) {
 		log.Fatal("grpc dial failed", zap.Error(err), zap.String("addr", addr))
 		return
 	}
-	c.Conn = conn
+	c.conn = conn
 	c.md = metadata.Pairs("Z9-Srv", target)
 	log.Info("grpc dial success", zap.String("addr", addr))
 	return
