@@ -1,23 +1,38 @@
 package svr
 
 import (
-	"fmt"
-
 	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
-// Dial impl
-func Dial(serviceName string) (conn *grpc.ClientConn, err error) {
-	gateway := conf.Global.GetString("service.gateway")
-	addr := fmt.Sprintf("%s/%s.grpc", gateway, serviceName)
-	conn, err = grpc.Dial(addr, grpc.WithInsecure())
+// Client struct
+type Client struct {
+	Conn *grpc.ClientConn
+	Opts []grpc.CallOption
+}
+
+// NewClient impl
+func NewClient(serviceName string) (cli *Client, err error) {
+	addr := conf.Global.GetString("service.gateway")
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("grpc dial failed", zap.Error(err), zap.String("addr", addr))
-	} else {
-		log.Info("grpc dial success", zap.String("addr", addr))
+		return
 	}
+	cli = &Client{
+		Conn: conn,
+		Opts: []grpc.CallOption{},
+	}
+	mds := metadata.Pairs("forward-to", serviceName)
+	cli.Opts = append(cli.Opts, grpc.Header(&mds))
+	log.Fatal("grpc dial success", zap.String("addr", addr))
 	return
+}
+
+// Close impl
+func (c *Client) Close() error {
+	return c.Conn.Close()
 }

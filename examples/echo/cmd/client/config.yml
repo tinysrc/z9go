@@ -1,2 +1,2 @@
 service:
-  addr: ":9001"
+  gateway: "127.0.0.1:80"

@@ -9,20 +9,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Server interface
-type Server interface {
-	Core() *grpc.Server
-	Run() error
-}
-
-type server struct {
+// Server struct
+type Server struct {
 	addr   string
 	listen net.Listener
-	server *grpc.Server
+	Server *grpc.Server
 }
 
-// NewServer new instance
-func NewServer() Server {
+// NewServer impl
+func NewServer() *Server {
 	addr := conf.Global.GetString("service.addr")
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -30,19 +25,19 @@ func NewServer() Server {
 		return nil
 	}
 	svr := grpc.NewServer()
-	return &server{
+	return &Server{
 		addr:   addr,
 		listen: lis,
-		server: svr,
+		Server: svr,
 	}
 }
 
-func (s *server) Core() *grpc.Server {
-	return s.server
-}
-
-func (s *server) Run() (err error) {
-	if err := s.server.Serve(s.listen); err != nil {
+// Run impl
+func (s *Server) Run() (err error) {
+	name := conf.Global.GetString("service.name")
+	addr := conf.Global.GetString("service.addr")
+	log.Info("service start", zap.String("serviceName", name), zap.String("serviceAddr", addr))
+	if err := s.Server.Serve(s.listen); err != nil {
 		log.Error("server serve failed", zap.Error(err))
 	}
 	return

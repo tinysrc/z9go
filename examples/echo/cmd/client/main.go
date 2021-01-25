@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/tinysrc/z9go/examples/echo/pb"
-	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
 	"github.com/tinysrc/z9go/pkg/svr"
 	"go.uber.org/zap"
@@ -14,17 +13,16 @@ import (
 
 func main() {
 	defer log.Close()
-	addr := conf.Global.GetString("service.addr")
-	conn, err := svr.Dial(addr)
+	cli, err := svr.NewClient("echo")
 	if err != nil {
 		return
 	}
-	defer conn.Close()
-	service := pb.NewEchoClient(conn)
+	defer cli.Close()
+	echoClient := pb.NewEchoClient(cli.Conn)
 	for i := 0; i < 10; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 		defer cancel()
-		out, err := service.Echo(ctx, &pb.StringMessage{Value: strconv.Itoa(i)})
+		out, err := echoClient.Echo(ctx, &pb.StringMessage{Value: strconv.Itoa(i)}, cli.Opts...)
 		if err != nil {
 			log.Error("call echo failed", zap.Error(err))
 		} else {
