@@ -52,4 +52,5 @@ func init() {
 			return
 		},
 	}
+	log.Info("redis init success")
 }
