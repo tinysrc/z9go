@@ -63,7 +63,7 @@ func (c *Client) Dial(target string) (conn *grpc.ClientConn, err error) {
 		return
 	}
 	c.conn = conn
-	c.md = metadata.Pairs("Z9-Srv", target)
+	c.md = metadata.Pairs("Z9-Svc", target)
 	log.Info("grpc dial success", zap.String("addr", addr))
 	return
 }
