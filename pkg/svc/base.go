@@ -1,4 +1,4 @@
-package srv
+package svc
 
 import "github.com/tinysrc/z9go/pkg/conf"
 
