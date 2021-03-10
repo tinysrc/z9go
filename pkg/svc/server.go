@@ -17,14 +17,14 @@ type Server struct {
 }
 
 // NewServer impl
-func NewServer() *Server {
+func NewServer(opt ...grpc.ServerOption) *Server {
 	addr := conf.Global.GetString("service.addr")
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal("create listen failed", zap.String("addr", addr))
 		return nil
 	}
-	svr := grpc.NewServer()
+	svr := grpc.NewServer(opt...)
 	return &Server{
 		addr:   addr,
 		listen: lis,
