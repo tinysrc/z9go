@@ -10,7 +10,7 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
 	"go.uber.org/zap"
@@ -24,17 +24,20 @@ type Server struct {
 	Server *grpc.Server
 }
 
-func auth(ctx context.Context) (context.Context, error) {
-	return nil, nil
+func dummyAuth(ctx context.Context) (context.Context, error) {
+	return ctx, nil
 }
 
 // NewServer impl
-func NewServer() *Server {
+func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 	addr := conf.Global.GetString("service.addr")
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal("create listen failed", zap.String("addr", addr))
 		return nil
+	}
+	if authFunc == nil {
+		authFunc = dummyAuth
 	}
 	svr := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
@@ -42,7 +45,7 @@ func NewServer() *Server {
 			grpc_opentracing.StreamServerInterceptor(),
 			grpc_prometheus.StreamServerInterceptor,
 			grpc_zap.StreamServerInterceptor(log.Logger),
-			grpc_auth.StreamServerInterceptor(auth),
+			grpc_auth.StreamServerInterceptor(authFunc),
 			grpc_recovery.StreamServerInterceptor(),
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -50,7 +53,7 @@ func NewServer() *Server {
 			grpc_opentracing.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 			grpc_zap.UnaryServerInterceptor(log.Logger),
-			grpc_auth.UnaryServerInterceptor(auth),
+			grpc_auth.UnaryServerInterceptor(authFunc),
 			grpc_recovery.UnaryServerInterceptor(),
 		)),
 	)

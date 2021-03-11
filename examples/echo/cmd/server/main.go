@@ -20,7 +20,7 @@ func (s *service) Echo(ctx context.Context, in *pb.StringMessage) (*pb.StringMes
 
 func main() {
 	defer log.Close()
-	s := svc.NewServer()
+	s := svc.NewServer(nil)
 	pb.RegisterEchoServiceServer(s.Server, &service{})
 	s.Run()
 }

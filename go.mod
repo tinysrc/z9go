@@ -3,6 +3,8 @@ module github.com/tinysrc/z9go
 go 1.15
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/protobuf v1.4.3
 	github.com/gomodule/redigo v1.8.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
