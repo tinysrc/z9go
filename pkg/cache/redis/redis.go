@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"context"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
@@ -23,7 +25,8 @@ func init() {
 		Password: conf.Global.GetString("redis.password"),
 		DB:       conf.Global.GetInt("redis.db"),
 	})
-	_, err := Client.Ping(nil).Result()
+	ctx := context.Background()
+	_, err := Client.Ping(ctx).Result()
 	if err != nil {
 		log.Error("redis init failed", zap.Error(err))
 	} else {
