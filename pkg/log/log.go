@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var logger *zap.Logger
+var Logger *zap.Logger
 
 func initConfig() {
 	conf.Global.SetDefault("log.console", true)
@@ -19,48 +19,48 @@ func initConfig() {
 
 func init() {
 	initConfig()
-	logger = newLogger()
-	if logger == nil {
+	Logger = newLogger()
+	if Logger == nil {
 		panic("new logger failed")
 	}
 }
 
 // Close make sure the log is finished
 func Close() {
-	logger.Sync()
+	Logger.Sync()
 }
 
 // Debug wrap
 func Debug(msg string, fields ...zap.Field) {
-	logger.Debug(msg, fields...)
+	Logger.Debug(msg, fields...)
 }
 
 // Info wrap
 func Info(msg string, fields ...zap.Field) {
-	logger.Info(msg, fields...)
+	Logger.Info(msg, fields...)
 }
 
 // Warn wrap
 func Warn(msg string, fields ...zap.Field) {
-	logger.Warn(msg, fields...)
+	Logger.Warn(msg, fields...)
 }
 
 // Error wrap
 func Error(msg string, fields ...zap.Field) {
-	logger.Error(msg, fields...)
+	Logger.Error(msg, fields...)
 }
 
 // DPanic wrap
 func DPanic(msg string, fields ...zap.Field) {
-	logger.DPanic(msg, fields...)
+	Logger.DPanic(msg, fields...)
 }
 
 // Panic wrap
 func Panic(msg string, fields ...zap.Field) {
-	logger.Panic(msg, fields...)
+	Logger.Panic(msg, fields...)
 }
 
 // Fatal wrap
 func Fatal(msg string, fields ...zap.Field) {
-	logger.Fatal(msg, fields...)
+	Logger.Fatal(msg, fields...)
 }
