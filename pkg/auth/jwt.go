@@ -1,4 +1,4 @@
-package jwt
+package auth
 
 import (
 	"context"
@@ -36,14 +36,14 @@ func NewJWT() *JWT {
 	return &JWT{[]byte(sign)}
 }
 
-// ToToken impl
-func (j *JWT) ToToken(claims CustomClaims) (string, error) {
+// MakeToken impl
+func (j *JWT) MakeToken(claims CustomClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.Sign)
 }
 
-// FromToken impl
-func (j *JWT) FromToken(ts string) (*CustomClaims, error) {
+// ParseToken impl
+func (j *JWT) ParseToken(ts string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(ts, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.Sign, nil
 	})
@@ -68,14 +68,14 @@ func (j *JWT) FromToken(ts string) (*CustomClaims, error) {
 	return nil, errTokenInvalid
 }
 
-// Auth impl
-func Auth(ctx context.Context) (context.Context, error) {
+// AuthFunc impl
+func AuthFunc(ctx context.Context) (context.Context, error) {
 	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 	if err != nil {
 		return nil, err
 	}
 	j := NewJWT()
-	_, err = j.FromToken(token)
+	_, err = j.ParseToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
 	}
