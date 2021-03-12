@@ -5,9 +5,10 @@ import (
 	"go.uber.org/zap"
 )
 
+// Logger instance
 var Logger *zap.Logger
 
-func initConfig() {
+func init() {
 	conf.Global.SetDefault("log.console", true)
 	conf.Global.SetDefault("log.level", "debug")
 	conf.Global.SetDefault("log.filename", "./service.log")
@@ -15,10 +16,6 @@ func initConfig() {
 	conf.Global.SetDefault("log.maxAge", 0)
 	conf.Global.SetDefault("log.maxBackups", 0)
 	conf.Global.SetDefault("log.compress", false)
-}
-
-func init() {
-	initConfig()
 	Logger = newLogger()
 	if Logger == nil {
 		panic("new logger failed")

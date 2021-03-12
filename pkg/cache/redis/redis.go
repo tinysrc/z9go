@@ -12,14 +12,10 @@ import (
 // Client instance
 var Client *redis.Client
 
-func initConfig() {
+func init() {
 	conf.Global.SetDefault("redis.addr", "localhost:6379")
 	conf.Global.SetDefault("redis.password", "")
 	conf.Global.SetDefault("redis.db", 0)
-}
-
-func init() {
-	initConfig()
 	Client = redis.NewClient(&redis.Options{
 		Addr:     conf.Global.GetString("redis.addr"),
 		Password: conf.Global.GetString("redis.password"),

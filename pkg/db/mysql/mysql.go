@@ -8,14 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// Db gorm
+// Db instance
 var Db *gorm.DB
 
-func initConfig() {
-	conf.Global.SetDefault("mysql.dsn", "root:123456@tcp(127.0.0.1:3306)/z9?charset=utf8")
-}
-
 func init() {
+	conf.Global.SetDefault("mysql.dsn", "root:123456@tcp(127.0.0.1:3306)/z9?charset=utf8")
 	dsn := conf.Global.GetString("mysql.dsn")
 	db, err := gorm.Open(
 		mysql.New(mysql.Config{
