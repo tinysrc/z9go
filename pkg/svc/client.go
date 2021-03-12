@@ -43,7 +43,14 @@ func (c *Client) allHandlers() (hs []grpc.UnaryClientInterceptor) {
 }
 
 func (c *Client) getlastHandler() grpc.UnaryClientInterceptor {
-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
 		// timeout
 		ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 		defer cancel()
