@@ -36,32 +36,18 @@ func firstInc() (inc string, err error) {
 	return
 }
 
-func secondInc() (inc string, err error) {
-	mod, err := utils.LatestMod("github.com/grpc-ecosystem/grpc-gateway", "v2")
-	if err != nil {
-		return
-	}
-	inc = path.Join(mod, "third_party/googleapis")
-	return
-}
-
 func baseArgs() (args []string, err error) {
 	firstInc, err := firstInc()
 	if err != nil {
 		return
 	}
-	secondInc, err := secondInc()
-	if err != nil {
-		return
-	}
-	thirdInc, err := os.Getwd()
+	secondInc, err := os.Getwd()
 	if err != nil {
 		return
 	}
 	args = []string{
 		"-I", firstInc,
 		"-I", secondInc,
-		"-I", thirdInc,
 	}
 	return
 }
