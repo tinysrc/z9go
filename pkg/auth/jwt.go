@@ -71,7 +71,7 @@ func (j *JWT) ParseToken(ts string) (*CustomClaims, error) {
 
 // AuthFunc impl
 func AuthFunc(ctx context.Context) (context.Context, error) {
-	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
+	token, err := grpc_auth.AuthFromMD(ctx, "Basic")
 	if err != nil {
 		return nil, err
 	}
