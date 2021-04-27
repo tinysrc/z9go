@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/tinysrc/z9go/pkg/conf"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -75,9 +76,10 @@ func AuthFunc(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 	j := NewJWT()
-	_, err = j.ParseToken(token)
+	claims, err := j.ParseToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
 	}
+	grpc_ctxtags.Extract(ctx).Set("userid", claims.UUID.String())
 	return ctx, nil
 }
