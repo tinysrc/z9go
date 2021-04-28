@@ -39,6 +39,10 @@ func LatestMod(prefix string, mod string) (string, error) {
 
 // Z9Root z9 root
 func Z9Root() (string, error) {
+	z9root := os.Getenv("Z9ROOT")
+	if z9root != "" {
+		return z9root, nil
+	}
 	mod, err := LatestMod("github.com/tinysrc", "z9go")
 	if err != nil {
 		return "", err
