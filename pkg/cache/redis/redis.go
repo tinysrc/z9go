@@ -12,6 +12,9 @@ import (
 // Client instance
 var Client *redis.Client
 
+// Nil
+const Nil = redis.Nil
+
 func init() {
 	conf.Global.SetDefault("redis.addr", "localhost:6379")
 	conf.Global.SetDefault("redis.password", "")
