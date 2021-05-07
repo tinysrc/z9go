@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gofrs/uuid"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/mw/tags"
@@ -22,7 +21,7 @@ var (
 
 // CustomClaims struct
 type CustomClaims struct {
-	UUID uuid.UUID
+	UUID string
 	jwt.StandardClaims
 }
 
@@ -80,6 +79,6 @@ func AuthFunc(ctx context.Context) (context.Context, error) {
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
 	}
-	tags.Extract(ctx).Set("userid", claims.UUID.String())
+	tags.Extract(ctx).Set("userid", claims.UUID)
 	return ctx, nil
 }
