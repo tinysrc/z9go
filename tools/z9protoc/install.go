@@ -15,11 +15,11 @@ var plugins = []plugin{
 	},
 	{
 		name: "protoc-gen-go",
-		url:  "google.golang.org/protobuf/cmd/protoc-gen-go@v1.26.0",
+		url:  "google.golang.org/protobuf/cmd/protoc-gen-go",
 	},
 	{
 		name: "protoc-gen-go-grpc",
-		url:  "google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.37.0",
+		url:  "google.golang.org/grpc/cmd/protoc-gen-go-grpc",
 	},
 }
 
