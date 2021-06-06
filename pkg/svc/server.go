@@ -2,6 +2,10 @@ package svc
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"io/ioutil"
 	"net"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -15,6 +19,7 @@ import (
 	"github.com/tinysrc/z9go/pkg/log"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 // Server struct
@@ -30,16 +35,40 @@ func dummyAuth(ctx context.Context) (context.Context, error) {
 
 // NewServer impl
 func NewServer(authFunc grpc_auth.AuthFunc) *Server {
+	// 加载服务端私钥和证书
+	certFile := conf.Global.GetString("service.tls.server.certFile")
+	keyFile := conf.Global.GetString("service.tls.server.keyFile")
+	caFile := conf.Global.GetString("service.tls.caFile")
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		panic(err)
+	}
+	// 根证书
+	rootCAs := x509.NewCertPool()
+	ca, err := ioutil.ReadFile(caFile)
+	if err != nil {
+		panic(err)
+	}
+	if !rootCAs.AppendCertsFromPEM(ca) {
+		panic("rootCAs append failed")
+	}
+	// tls配置
+	tlsCfg := &tls.Config{
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		Certificates: []tls.Certificate{cert},
+		ClientCAs:    rootCAs,
+	}
+	// 创建监听
 	addr := conf.Global.GetString("service.addr")
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatal("create listen failed", zap.String("addr", addr))
-		return nil
+		panic(fmt.Sprintf("create listen failed addr=%s", addr))
 	}
 	if authFunc == nil {
 		authFunc = dummyAuth
 	}
 	svr := grpc.NewServer(
+		grpc.Creds(credentials.NewTLS(tlsCfg)),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpc_ctxtags.StreamServerInterceptor(),
 			grpc_opentracing.StreamServerInterceptor(),
