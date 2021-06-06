@@ -23,8 +23,8 @@ type Client struct {
 	md       metadata.MD
 }
 
-// NewClient impl
-func NewClient() *Client {
+// NewClientCreds impl
+func NewClientCreds() credentials.TransportCredentials {
 	// 加载客户端私钥和证书
 	serverName := conf.Global.GetString("service.tls.client.serverName")
 	certFile := conf.Global.GetString("service.tls.client.certFile")
@@ -44,13 +44,17 @@ func NewClient() *Client {
 		panic("rootCAs append failed")
 	}
 	// 创建凭证
-	creds := credentials.NewTLS(&tls.Config{
+	return credentials.NewTLS(&tls.Config{
 		ServerName:   serverName,
 		Certificates: []tls.Certificate{cert},
 		RootCAs:      rootCAs,
 	})
+}
+
+// NewClient impl
+func NewClient() *Client {
 	return &Client{
-		creds: creds,
+		creds: NewClientCreds(),
 	}
 }
 

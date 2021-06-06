@@ -33,8 +33,7 @@ func dummyAuth(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-// NewServer impl
-func NewServer(authFunc grpc_auth.AuthFunc) *Server {
+func newServerCreds() credentials.TransportCredentials {
 	// 加载服务端私钥和证书
 	certFile := conf.Global.GetString("service.tls.server.certFile")
 	keyFile := conf.Global.GetString("service.tls.server.keyFile")
@@ -52,13 +51,16 @@ func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 	if !rootCAs.AppendCertsFromPEM(ca) {
 		panic("rootCAs append failed")
 	}
-	// tls配置
-	tlsCfg := &tls.Config{
+	// 创建凭证
+	return credentials.NewTLS(&tls.Config{
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 		Certificates: []tls.Certificate{cert},
 		ClientCAs:    rootCAs,
-	}
-	// 创建监听
+	})
+}
+
+// NewServer impl
+func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 	addr := conf.Global.GetString("service.addr")
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -68,7 +70,7 @@ func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 		authFunc = dummyAuth
 	}
 	svr := grpc.NewServer(
-		grpc.Creds(credentials.NewTLS(tlsCfg)),
+		grpc.Creds(newServerCreds()),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpc_ctxtags.StreamServerInterceptor(),
 			grpc_opentracing.StreamServerInterceptor(),
