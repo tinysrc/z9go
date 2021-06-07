@@ -23,7 +23,8 @@ type Client struct {
 	md       metadata.MD
 }
 
-func newClientCreds() credentials.TransportCredentials {
+// NewClientCreds impl
+func NewClientCreds() credentials.TransportCredentials {
 	// 加载客户端私钥和证书
 	serverName := conf.Global.GetString("service.tls.client.serverName")
 	certFile := conf.Global.GetString("service.tls.client.certFile")
@@ -53,7 +54,7 @@ func newClientCreds() credentials.TransportCredentials {
 // NewClient impl
 func NewClient() *Client {
 	return &Client{
-		creds: newClientCreds(),
+		creds: NewClientCreds(),
 	}
 }
 
