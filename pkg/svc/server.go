@@ -2,10 +2,7 @@ package svc
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -19,7 +16,6 @@ import (
 	"github.com/tinysrc/z9go/pkg/log"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 // Server struct
@@ -33,32 +29,6 @@ func dummyAuth(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-func newServerCreds() credentials.TransportCredentials {
-	// 加载服务端私钥和证书
-	certFile := conf.Global.GetString("service.tls.server.certFile")
-	keyFile := conf.Global.GetString("service.tls.server.keyFile")
-	caFile := conf.Global.GetString("service.tls.caFile")
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil {
-		panic(err)
-	}
-	// 根证书
-	rootCAs := x509.NewCertPool()
-	ca, err := ioutil.ReadFile(caFile)
-	if err != nil {
-		panic(err)
-	}
-	if !rootCAs.AppendCertsFromPEM(ca) {
-		panic("rootCAs append failed")
-	}
-	// 创建凭证
-	return credentials.NewTLS(&tls.Config{
-		ClientAuth:   tls.RequireAndVerifyClientCert,
-		Certificates: []tls.Certificate{cert},
-		ClientCAs:    rootCAs,
-	})
-}
-
 // NewServer impl
 func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 	addr := conf.Global.GetString("service.addr")
@@ -70,7 +40,6 @@ func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 		authFunc = dummyAuth
 	}
 	svr := grpc.NewServer(
-		grpc.Creds(newServerCreds()),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpc_ctxtags.StreamServerInterceptor(),
 			grpc_opentracing.StreamServerInterceptor(),

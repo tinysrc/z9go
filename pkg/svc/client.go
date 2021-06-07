@@ -2,60 +2,25 @@ package svc
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
 	"time"
 
 	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 )
 
 // Client struct
 type Client struct {
 	handlers []grpc.UnaryClientInterceptor
-	creds    credentials.TransportCredentials
 	conn     *grpc.ClientConn
 	md       metadata.MD
 }
 
-// NewClientCreds impl
-func NewClientCreds() credentials.TransportCredentials {
-	// 加载客户端私钥和证书
-	serverName := conf.Global.GetString("service.tls.client.serverName")
-	certFile := conf.Global.GetString("service.tls.client.certFile")
-	keyFile := conf.Global.GetString("service.tls.client.keyFile")
-	caFile := conf.Global.GetString("service.tls.caFile")
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil {
-		panic(err)
-	}
-	// 根证书
-	rootCAs := x509.NewCertPool()
-	ca, err := ioutil.ReadFile(caFile)
-	if err != nil {
-		panic(err)
-	}
-	if !rootCAs.AppendCertsFromPEM(ca) {
-		panic("rootCAs append failed")
-	}
-	// 创建凭证
-	return credentials.NewTLS(&tls.Config{
-		ServerName:   serverName,
-		Certificates: []tls.Certificate{cert},
-		RootCAs:      rootCAs,
-	})
-}
-
 // NewClient impl
 func NewClient() *Client {
-	return &Client{
-		creds: NewClientCreds(),
-	}
+	return &Client{}
 }
 
 // Use impl
@@ -96,7 +61,7 @@ func (c *Client) getlastHandler() grpc.UnaryClientInterceptor {
 
 // Dial impl
 func (c *Client) Dial(target string) (conn *grpc.ClientConn, err error) {
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(c.creds)}
+	opts := []grpc.DialOption{grpc.WithInsecure()}
 	opts = append(opts, grpc.WithChainUnaryInterceptor(c.allHandlers()...))
 	addr := conf.Global.GetString("service.gateway")
 	conn, err = grpc.Dial(addr, opts...)
