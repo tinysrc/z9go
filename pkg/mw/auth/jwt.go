@@ -21,7 +21,7 @@ var (
 
 // CustomClaims struct
 type CustomClaims struct {
-	UUID string
+	Userid string
 	jwt.StandardClaims
 }
 
@@ -79,6 +79,6 @@ func AuthFunc(ctx context.Context) (context.Context, error) {
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
 	}
-	tags.Extract(ctx).Set("userid", claims.UUID)
+	tags.Extract(ctx).Set("userid", claims.Userid)
 	return ctx, nil
 }
