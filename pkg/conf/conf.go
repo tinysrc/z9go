@@ -1,6 +1,8 @@
 package conf
 
 import (
+	"flag"
+
 	"github.com/spf13/viper"
 )
 
@@ -12,8 +14,13 @@ func init() {
 	if Global == nil {
 		panic("create global config failed")
 	}
-	Global.SetConfigName("config")
+	cfg := flag.String("c", "config", "specify config filename")
+	flag.Parse()
+	Global.SetConfigName(*cfg)
 	Global.AddConfigPath("/etc/z9/")
 	Global.AddConfigPath("./")
-	Global.ReadInConfig()
+	err := Global.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
 }
