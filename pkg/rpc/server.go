@@ -1,8 +1,7 @@
-package svc
+package rpc
 
 import (
 	"context"
-	"fmt"
 	"net"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -12,16 +11,12 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
 // Server struct
 type Server struct {
-	addr   string
-	listen net.Listener
 	Server *grpc.Server
 }
 
@@ -31,15 +26,10 @@ func dummyAuth(ctx context.Context) (context.Context, error) {
 
 // NewServer impl
 func NewServer(authFunc grpc_auth.AuthFunc) *Server {
-	addr := conf.Global.GetString("service.addr")
-	lis, err := net.Listen("tcp", addr)
-	if err != nil {
-		panic(fmt.Sprintf("create listen failed addr=%s", addr))
-	}
 	if authFunc == nil {
 		authFunc = dummyAuth
 	}
-	svr := grpc.NewServer(
+	s := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpc_ctxtags.StreamServerInterceptor(),
 			grpc_opentracing.StreamServerInterceptor(),
@@ -58,19 +48,18 @@ func NewServer(authFunc grpc_auth.AuthFunc) *Server {
 		)),
 	)
 	return &Server{
-		addr:   addr,
-		listen: lis,
-		Server: svr,
+		Server: s,
 	}
 }
 
-// Run impl
-func (s *Server) Run() (err error) {
-	name := conf.Global.GetString("service.name")
-	addr := conf.Global.GetString("service.addr")
-	log.Info("service start", zap.String("serviceName", name), zap.String("serviceAddr", addr))
-	if err := s.Server.Serve(s.listen); err != nil {
-		log.Error("server serve failed", zap.Error(err))
+func (s *Server) Run(addr string) error {
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
 	}
-	return
+	return s.Server.Serve(lis)
+}
+
+func (s *Server) Stop() {
+	s.Server.GracefulStop()
 }

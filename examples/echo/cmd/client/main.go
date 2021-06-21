@@ -5,13 +5,13 @@ import (
 
 	"github.com/tinysrc/z9go/examples/echo/pb"
 	"github.com/tinysrc/z9go/pkg/log"
-	"github.com/tinysrc/z9go/pkg/svc"
+	"github.com/tinysrc/z9go/pkg/rpc"
 	"go.uber.org/zap"
 )
 
 func main() {
 	defer log.Close()
-	cli := svc.NewClient()
+	cli := rpc.NewClient()
 	conn, err := cli.Dial("echo")
 	if err != nil {
 		return

@@ -1,21 +1,17 @@
-package svc
+package rpc
 
 import (
 	"context"
 	"time"
 
-	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
-// Client struct
 type Client struct {
 	handlers []grpc.UnaryClientInterceptor
 	conn     *grpc.ClientConn
-	md       metadata.MD
 }
 
 // NewClient impl
@@ -60,22 +56,14 @@ func (c *Client) getlastHandler() grpc.UnaryClientInterceptor {
 }
 
 // Dial impl
-func (c *Client) Dial(target string) (conn *grpc.ClientConn, err error) {
-	opts := []grpc.DialOption{grpc.WithInsecure()}
+func (c *Client) Dial(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	opts = append(opts, grpc.WithChainUnaryInterceptor(c.allHandlers()...))
-	addr := conf.Global.GetString("service.gateway")
-	conn, err = grpc.Dial(addr, opts...)
+	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
-		log.Fatal("grpc dial failed", zap.Error(err), zap.String("addr", addr))
-		return
+		log.Fatal("grpc dial failed", zap.String("target", target))
+		return nil, err
 	}
 	c.conn = conn
-	c.md = metadata.Pairs("Z9-Svc", target)
-	log.Info("grpc dial success", zap.String("addr", addr))
-	return
-}
-
-// NewCallCtx impl
-func (c *Client) NewCallCtx() context.Context {
-	return metadata.NewOutgoingContext(context.Background(), c.md)
+	log.Info("grpc dial success", zap.String("target", target))
+	return conn, nil
 }
