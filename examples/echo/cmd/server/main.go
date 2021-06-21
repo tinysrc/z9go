@@ -63,7 +63,11 @@ func main() {
 		Addr:    conf.Global.GetString("service.gwlisten"),
 		Handler: mux,
 	}
-	pb.RegisterEchoServiceHandlerServer(ctx, mux, svc)
+	err = pb.RegisterEchoServiceHandlerServer(ctx, mux, svc)
+	if err != nil {
+		log.Fatal("register gateway protocol failed", zap.Error(err))
+		return
+	}
 	// run
 	wg := sync.WaitGroup{}
 	// run rpc server
