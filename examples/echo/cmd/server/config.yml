@@ -1,3 +1,11 @@
 service:
+  id: "1"
   name: "echo"
+  version: "1.0"
   addr: ":9001"
+  gwaddr: ":8001"
+  weight: "1"
+
+etcd:
+  endpoints:
+    - "localhost:2379"
