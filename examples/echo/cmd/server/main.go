@@ -58,7 +58,6 @@ func main() {
 	pb.RegisterEchoServiceServer(svr.Server, svc)
 	// init rpc gateway
 	ctx := context.Background()
-	//ctx, cancel := context.WithCancel(ctx)
 	mux := runtime.NewServeMux()
 	gwsvr := http.Server{
 		Addr:    conf.Global.GetString("service.gwlisten"),
