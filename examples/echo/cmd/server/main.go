@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -40,6 +39,7 @@ func main() {
 		Id:       conf.Global.GetString("service.id"),
 		Name:     conf.Global.GetString("service.name"),
 		Version:  conf.Global.GetString("service.version"),
+		Address:  conf.Global.GetString("service.addr"),
 		Metadata: metadata.Pairs("weight", conf.Global.GetString("service.weight")),
 	}
 	reg, err := etcd.NewRegistrar(&etcd.Config{
@@ -48,16 +48,22 @@ func main() {
 		TTL:    10 * time.Second,
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal("new registrar failed", zap.Error(err))
+		return
 	}
+	log.Info("init etcd success")
 	// init rpc server
 	svr := rpc.NewServer(nil)
 	svc := &service{}
 	pb.RegisterEchoServiceServer(svr.Server, svc)
 	// init rpc gateway
 	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
+	//ctx, cancel := context.WithCancel(ctx)
 	mux := runtime.NewServeMux()
+	gwsvr := http.Server{
+		Addr:    conf.Global.GetString("service.gwlisten"),
+		Handler: mux,
+	}
 	pb.RegisterEchoServiceHandlerServer(ctx, mux, svc)
 	// run
 	wg := sync.WaitGroup{}
@@ -65,28 +71,38 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		addr := conf.Global.GetString("service.addr")
-		svr.Run(addr)
+		addr := conf.Global.GetString("service.listen")
+		log.Info("rpc server start", zap.String("addr", addr))
+		if err := svr.Run(addr); err != nil {
+			log.Error("rpc server run failed", zap.Error(err))
+		}
+		log.Info("rpc server stopped", zap.String("addr", addr))
 	}()
 	// run rpc gateway
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		addr := conf.Global.GetString("service.gwaddr")
-		http.ListenAndServe(addr, mux)
+		log.Info("rpc gateway start", zap.String("addr", gwsvr.Addr))
+		if err := gwsvr.ListenAndServe(); err != nil {
+			log.Error("rpc gateway run failed", zap.Error(err))
+		}
+		log.Info("rpc gateway stopped", zap.String("addr", gwsvr.Addr))
 	}()
 	// run etcd registrar
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		log.Info("etcd register start")
 		reg.Register(si)
+		log.Info("etcd register stopped")
 	}()
 	// signal
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGINT)
+	signal.Notify(signalChan, os.Interrupt)
 	<-signalChan
 	// etcd unregister
 	reg.Unregister(si)
-	cancel()
+	gwsvr.Shutdown(ctx)
 	svr.Stop()
 	wg.Wait()
 }

@@ -2,8 +2,9 @@ service:
   id: "1"
   name: "echo"
   version: "1.0"
-  addr: ":9001"
-  gwaddr: ":8001"
+  addr: "localhost:9001"
+  listen: ":9001"
+  gwlisten: ":8001"
   weight: "1"
 
 etcd:
