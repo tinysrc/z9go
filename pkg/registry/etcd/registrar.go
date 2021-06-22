@@ -103,7 +103,3 @@ func (r *Registrar) Unregister(si *registry.ServiceInfo) error {
 	}
 	return nil
 }
-
-func (r *Registrar) Close() {
-	r.client.Close()
-}

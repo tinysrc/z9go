@@ -42,10 +42,7 @@ func (w *Watcher) GetAllAddresses() []resolver.Address {
 		addrs := extractAddrs(resp)
 		if len(addrs) > 0 {
 			for _, v := range addrs {
-				ret = append(ret, resolver.Address{
-					Addr:     v.Address,
-					Metadata: &v.Metadata,
-				})
+				ret = append(ret, resolver.Address{Addr: v.Address})
 			}
 		}
 	}
@@ -90,10 +87,7 @@ func (w *Watcher) Watch() chan []resolver.Address {
 						grpclog.Errorf("parse service info failed error=%s", err.Error())
 						continue
 					}
-					addr := resolver.Address{
-						Addr:     si.Address,
-						Metadata: &si.Metadata,
-					}
+					addr := resolver.Address{Addr: si.Address}
 					if w.addAddr(addr) {
 						out <- w.cloneAddrs(w.addrs)
 					}
@@ -104,10 +98,7 @@ func (w *Watcher) Watch() chan []resolver.Address {
 						grpclog.Errorf("pase service info failed error=%s", err.Error())
 						continue
 					}
-					addr := resolver.Address{
-						Addr:     si.Address,
-						Metadata: &si.Metadata,
-					}
+					addr := resolver.Address{Addr: si.Address}
 					if w.removeAddr(addr) {
 						out <- w.cloneAddrs(w.addrs)
 					}
