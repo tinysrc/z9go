@@ -12,11 +12,14 @@ import (
 type Client struct {
 	handlers []grpc.UnaryClientInterceptor
 	conn     *grpc.ClientConn
+	sign     string
 }
 
 // NewClient impl
-func NewClient() *Client {
-	return &Client{}
+func NewClient(sign string) *Client {
+	return &Client{
+		sign: sign,
+	}
 }
 
 // Use impl

@@ -6,7 +6,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/mw/tags"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -31,8 +30,7 @@ type JWT struct {
 }
 
 // NewJWT impl
-func NewJWT() *JWT {
-	sign := conf.Global.GetString("service.jwt.sign")
+func NewJWT(sign string) *JWT {
 	return &JWT{[]byte(sign)}
 }
 
@@ -69,12 +67,12 @@ func (j *JWT) ParseToken(ts string) (*CustomClaims, error) {
 }
 
 // AuthFunc impl
-func AuthFunc(ctx context.Context) (context.Context, error) {
+func AuthFunc(ctx context.Context, sign string) (context.Context, error) {
 	token, err := grpc_auth.AuthFromMD(ctx, "Basic")
 	if err != nil {
 		return nil, err
 	}
-	j := NewJWT()
+	j := NewJWT(sign)
 	claims, err := j.ParseToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
