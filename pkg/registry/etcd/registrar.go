@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tinysrc/z9go/pkg/naming/registry"
+	"github.com/tinysrc/z9go/pkg/registry"
 	etcd3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/etcdserver/api/v3rpc/rpctypes"
 	"golang.org/x/net/context"

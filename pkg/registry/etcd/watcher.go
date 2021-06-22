@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/tinysrc/z9go/pkg/naming/registry"
+	"github.com/tinysrc/z9go/pkg/registry"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	etcd3 "go.etcd.io/etcd/client/v3"
 	"golang.org/x/net/context"
