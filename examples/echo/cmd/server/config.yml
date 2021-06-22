@@ -5,11 +5,13 @@ service:
   addr: "localhost:9001"
   listen: ":9001"
   gwlisten: ":8001"
-  weight: 1
 
 etcd:
   endpoints:
     - "localhost:2379"
+
+jwt:
+  sign: "echo"
 
 log:
   filename: "./echo.log"

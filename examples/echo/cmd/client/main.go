@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/tinysrc/z9go/examples/echo/pb"
+	"github.com/tinysrc/z9go/pkg/conf"
 	"github.com/tinysrc/z9go/pkg/log"
 	"github.com/tinysrc/z9go/pkg/rpc"
 	"go.uber.org/zap"
@@ -12,7 +13,8 @@ import (
 
 func main() {
 	defer log.Close()
-	cli := rpc.NewClient()
+	sign := conf.Global.GetString("jwt.sign")
+	cli := rpc.NewClient(sign)
 	conn, err := cli.Dial("echo")
 	if err != nil {
 		return
