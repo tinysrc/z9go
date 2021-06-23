@@ -25,7 +25,7 @@ func (s *service) Echo(ctx context.Context, in *pb.StringMessage) (*pb.StringMes
 func main() {
 	defer log.Close()
 	// init rpc server
-	svr := rpc.NewServer(nil)
+	svr := rpc.NewServer(nil, nil)
 	svc := &service{}
 	pb.RegisterEchoServiceServer(svr.Server, svc)
 	// run
