@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tinysrc/z9go/pkg/registry"
+	"github.com/tinysrc/z9go/pkg/reg"
 	etcd3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/etcdserver/api/v3rpc/rpctypes"
 	"golang.org/x/net/context"
@@ -38,7 +38,7 @@ func NewRegistrar(cfg *Config) (*Registrar, error) {
 	}, nil
 }
 
-func (r *Registrar) Register(si *registry.ServiceInfo) error {
+func (r *Registrar) Register(si *reg.ServiceInfo) error {
 	val, err := json.Marshal(si)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func (r *Registrar) Register(si *registry.ServiceInfo) error {
 	}
 }
 
-func (r *Registrar) Unregister(si *registry.ServiceInfo) error {
+func (r *Registrar) Unregister(si *reg.ServiceInfo) error {
 	r.RLock()
 	cancel, ok := r.cancels[si.Id]
 	r.RUnlock()

@@ -1,4 +1,4 @@
-package registry
+package reg
 
 type ServiceInfo struct {
 	Id      string

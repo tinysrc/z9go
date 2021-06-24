@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/tinysrc/z9go/pkg/registry"
+	"github.com/tinysrc/z9go/pkg/reg"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	etcd3 "go.etcd.io/etcd/client/v3"
 	"golang.org/x/net/context"
@@ -49,14 +49,14 @@ func (w *Watcher) GetAllAddresses() []resolver.Address {
 	return ret
 }
 
-func extractAddrs(resp *etcd3.GetResponse) []registry.ServiceInfo {
-	ret := []registry.ServiceInfo{}
+func extractAddrs(resp *etcd3.GetResponse) []reg.ServiceInfo {
+	ret := []reg.ServiceInfo{}
 	if resp == nil || resp.Kvs == nil {
 		return ret
 	}
 	for i := range resp.Kvs {
 		if v := resp.Kvs[i].Value; v != nil {
-			si := registry.ServiceInfo{}
+			si := reg.ServiceInfo{}
 			err := json.Unmarshal(v, &si)
 			if err != nil {
 				grpclog.Infof("parse service info failed error=%s", err.Error())
@@ -81,7 +81,7 @@ func (w *Watcher) Watch() chan []resolver.Address {
 			for _, ev := range resp.Events {
 				switch ev.Type {
 				case mvccpb.PUT:
-					si := registry.ServiceInfo{}
+					si := reg.ServiceInfo{}
 					err := json.Unmarshal([]byte(ev.Kv.Value), &si)
 					if err != nil {
 						grpclog.Errorf("parse service info failed error=%s", err.Error())
@@ -92,7 +92,7 @@ func (w *Watcher) Watch() chan []resolver.Address {
 						out <- w.cloneAddrs(w.addrs)
 					}
 				case mvccpb.DELETE:
-					si := registry.ServiceInfo{}
+					si := reg.ServiceInfo{}
 					err := json.Unmarshal([]byte(ev.Kv.Value), &si)
 					if err != nil {
 						grpclog.Errorf("pase service info failed error=%s", err.Error())
