@@ -2,27 +2,21 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/tinysrc/z9go/pkg/log"
-	"github.com/tinysrc/z9go/pkg/mw/auth"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 type Client struct {
 	handlers []grpc.UnaryClientInterceptor
 	conn     *grpc.ClientConn
-	sign     string
 }
 
 // NewClient impl
 func NewClient(sign string) *Client {
-	return &Client{
-		sign: sign,
-	}
+	return &Client{}
 }
 
 // Use impl
@@ -53,10 +47,6 @@ func (c *Client) getlastHandler() grpc.UnaryClientInterceptor {
 		invoker grpc.UnaryInvoker,
 		opts ...grpc.CallOption,
 	) error {
-		// auth
-		claims := auth.CustomClaims{}
-		token, _ := auth.NewJWT(c.sign).MakeToken(claims)
-		ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Basic %s", token))
 		// timeout
 		ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 		defer cancel()

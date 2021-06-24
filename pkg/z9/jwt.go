@@ -1,14 +1,9 @@
-package auth
+package z9
 
 import (
-	"context"
 	"errors"
 
 	"github.com/dgrijalva/jwt-go"
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/tinysrc/z9go/pkg/mw/tags"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -64,19 +59,4 @@ func (j *JWT) ParseToken(ts string) (*CustomClaims, error) {
 		}
 	}
 	return nil, errTokenInvalid
-}
-
-// AuthFunc impl
-func AuthFunc(ctx context.Context, sign string) (context.Context, error) {
-	token, err := grpc_auth.AuthFromMD(ctx, "Basic")
-	if err != nil {
-		return nil, err
-	}
-	j := NewJWT(sign)
-	claims, err := j.ParseToken(token)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
-	}
-	tags.Extract(ctx).Set("userid", claims.Userid)
-	return ctx, nil
 }

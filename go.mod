@@ -7,8 +7,6 @@ require (
 	github.com/go-redis/redis/v8 v8.10.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/protobuf v1.5.2
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
 	github.com/spf13/viper v1.8.0
 	github.com/urfave/cli v1.22.5
