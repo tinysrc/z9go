@@ -6,6 +6,25 @@ import (
 	"google.golang.org/grpc"
 )
 
+type WrappedClientStream struct {
+	grpc.ClientStream
+	WrappedCtx context.Context
+}
+
+func (w *WrappedClientStream) Context() context.Context {
+	return w.WrappedCtx
+}
+
+func WrapClientStream(s grpc.ClientStream) *WrappedClientStream {
+	if w, ok := s.(*WrappedClientStream); ok {
+		return w
+	}
+	return &WrappedClientStream{
+		ClientStream: s,
+		WrappedCtx:   s.Context(),
+	}
+}
+
 type WrappedServerStream struct {
 	grpc.ServerStream
 	WrappedCtx context.Context

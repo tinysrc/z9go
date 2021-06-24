@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// AuthFromMD impl
 func AuthFromMD(ctx context.Context, scheme string) (string, error) {
 	val := utils.ExtractIncoming(ctx).Get("Authorization")
 	if val == "" {
