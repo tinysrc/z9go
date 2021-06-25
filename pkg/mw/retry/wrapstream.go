@@ -70,8 +70,8 @@ func (s *wrappedClientStream) RecvMsg(m interface{}) error {
 			md := utils.ExtractOutgoing(ctx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
 			ctx = md.ToOutgoing(ctx)
 		}
-		if s.callOpts.timeout != 0 {
-			ctx, cancel = context.WithTimeout(ctx, s.callOpts.timeout)
+		if s.callOpts.callTimeout != 0 {
+			ctx, cancel = context.WithTimeout(ctx, s.callOpts.callTimeout)
 		}
 		defer func() {
 			if cancel != nil {
@@ -103,7 +103,7 @@ func (s *wrappedClientStream) receiveMsgAndIndicateRetry(m interface{}) (bool, e
 		if s.parentCtx.Err() != nil {
 			logTrace(s.parentCtx, "grpc retry context error=%v", s.parentCtx.Err())
 			return false, err
-		} else if s.callOpts.timeout != 0 {
+		} else if s.callOpts.callTimeout != 0 {
 			logTrace(s.parentCtx, "grpc retry context error from retry call")
 			return true, err
 		}

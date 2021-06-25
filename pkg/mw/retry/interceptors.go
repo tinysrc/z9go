@@ -31,8 +31,8 @@ func UnaryClientInterceptor(cos ...CallOption) grpc.UnaryClientInterceptor {
 				md := utils.ExtractOutgoing(ctx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
 				newCtx = md.ToOutgoing(newCtx)
 			}
-			if callOpts.timeout != 0 {
-				newCtx, cancel = context.WithTimeout(newCtx, callOpts.timeout)
+			if callOpts.callTimeout != 0 {
+				newCtx, cancel = context.WithTimeout(newCtx, callOpts.callTimeout)
 			}
 			defer func() {
 				if cancel != nil {
@@ -48,7 +48,7 @@ func UnaryClientInterceptor(cos ...CallOption) grpc.UnaryClientInterceptor {
 				if ctx.Err() != nil {
 					logTrace(ctx, "grpc retry attempt=%d context error=%v", i, ctx.Err())
 					return err
-				} else if callOpts.timeout != 0 {
+				} else if callOpts.callTimeout != 0 {
 					logTrace(ctx, "grpc retry attempt=%d context error from retry call", i)
 					continue
 				}
@@ -79,8 +79,8 @@ func StreamClientInterceptor(cos ...CallOption) grpc.StreamClientInterceptor {
 			}
 			newCtx := ctx
 			var cancel context.CancelFunc
-			if callOpts.timeout != 0 {
-				newCtx, cancel = context.WithTimeout(newCtx, callOpts.timeout)
+			if callOpts.callTimeout != 0 {
+				newCtx, cancel = context.WithTimeout(newCtx, callOpts.callTimeout)
 			}
 			defer func() {
 				if cancel != nil {
@@ -105,7 +105,7 @@ func StreamClientInterceptor(cos ...CallOption) grpc.StreamClientInterceptor {
 				if ctx.Err() != nil {
 					logTrace(ctx, "grpc retry attempt=%d context error=%v", i, ctx.Err())
 					return nil, err
-				} else if callOpts.timeout != 0 {
+				} else if callOpts.callTimeout != 0 {
 					logTrace(ctx, "grpc retry attempt=%d context error from retry call", i)
 					continue
 				}

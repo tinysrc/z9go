@@ -14,10 +14,10 @@ var (
 		codes.Unavailable,
 	}
 	defaultOptions = &options{
-		max:       0,
-		timeout:   0,
-		incHeader: true,
-		codes:     DefaultRetryCodes,
+		max:         0,
+		callTimeout: 0,
+		incHeader:   true,
+		codes:       DefaultRetryCodes,
 		backoffFunc: BackoffContextFunc(func(ctx context.Context, attempt uint) time.Duration {
 			return BackoffLinear(50 * time.Microsecond)(attempt)
 		}),
@@ -65,17 +65,17 @@ func WithCodes(codes ...codes.Code) CallOption {
 	}
 }
 
-func WithTimeout(timeout time.Duration) CallOption {
+func WithCallTimeout(timeout time.Duration) CallOption {
 	return CallOption{
 		applyFunc: func(opts *options) {
-			opts.timeout = timeout
+			opts.callTimeout = timeout
 		},
 	}
 }
 
 type options struct {
 	max         uint
-	timeout     time.Duration
+	callTimeout time.Duration
 	incHeader   bool
 	codes       []codes.Code
 	backoffFunc BackoffContextFunc
