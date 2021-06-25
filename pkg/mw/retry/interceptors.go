@@ -2,7 +2,9 @@ package retry
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/tinysrc/z9go/pkg/mw/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +25,20 @@ func UnaryClientInterceptor(cos ...CallOption) grpc.UnaryClientInterceptor {
 			if err = waitRetryBackoff(i, ctx, callOpts); err != nil {
 				return err
 			}
-			newCtx := callContext(ctx, callOpts, i)
+			var newCtx context.Context
+			var cancel context.CancelFunc
+			if i > 0 && callOpts.incHeader {
+				md := utils.ExtractOutgoing(ctx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
+				newCtx = md.ToOutgoing(ctx)
+			}
+			if callOpts.timeout != 0 {
+				newCtx, cancel = context.WithTimeout(newCtx, callOpts.timeout)
+			}
+			defer func() {
+				if cancel != nil {
+					cancel()
+				}
+			}()
 			err = invoker(newCtx, method, req, reply, cc, grpcOpts...)
 			if err == nil {
 				return nil
@@ -62,7 +77,16 @@ func StreamClientInterceptor(cos ...CallOption) grpc.StreamClientInterceptor {
 			if err = waitRetryBackoff(i, ctx, callOpts); err != nil {
 				return nil, err
 			}
-			newCtx := callContext(ctx, callOpts, 0)
+			var newCtx context.Context
+			var cancel context.CancelFunc
+			if callOpts.timeout != 0 {
+				newCtx, cancel = context.WithTimeout(newCtx, callOpts.timeout)
+			}
+			defer func() {
+				if cancel != nil {
+					cancel()
+				}
+			}()
 			var cs grpc.ClientStream
 			cs, err = streamer(newCtx, desc, cc, method, grpcOpts...)
 			if err == nil {

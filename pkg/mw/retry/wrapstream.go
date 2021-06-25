@@ -3,8 +3,10 @@ package retry
 import (
 	"context"
 	"io"
+	"strconv"
 	"sync"
 
+	"github.com/tinysrc/z9go/pkg/mw/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -62,7 +64,20 @@ func (s *wrappedClientStream) RecvMsg(m interface{}) error {
 		if err := waitRetryBackoff(i, s.parentCtx, s.callOpts); err != nil {
 			return err
 		}
-		ctx := callContext(s.parentCtx, s.callOpts, i)
+		var ctx context.Context
+		var cancel context.CancelFunc
+		if i > 0 && s.callOpts.incHeader {
+			md := utils.ExtractOutgoing(s.parentCtx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
+			ctx = md.ToOutgoing(s.parentCtx)
+		}
+		if s.callOpts.timeout != 0 {
+			ctx, cancel = context.WithTimeout(ctx, s.callOpts.timeout)
+		}
+		defer func() {
+			if cancel != nil {
+				cancel()
+			}
+		}()
 		stream, err := s.reestablishStreamAndResendBuffer(ctx)
 		if err != nil {
 			if isRetriable(err, s.callOpts) {

@@ -2,10 +2,8 @@ package retry
 
 import (
 	"context"
-	"strconv"
 	"time"
 
-	"github.com/tinysrc/z9go/pkg/mw/utils"
 	"golang.org/x/net/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -50,17 +48,6 @@ func isCtxErr(err error) bool {
 		return true
 	}
 	return false
-}
-
-func callContext(ctx context.Context, callOpts *options, attempt uint) context.Context {
-	if callOpts.timeout != 0 {
-		ctx, _ = context.WithTimeout(ctx, callOpts.timeout)
-	}
-	if attempt > 0 && callOpts.incHeader {
-		md := utils.ExtractOutgoing(ctx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(attempt)))
-		ctx = md.ToOutgoing(ctx)
-	}
-	return ctx
 }
 
 func ctxToGrpcErr(err error) error {
