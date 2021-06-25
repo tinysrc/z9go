@@ -64,11 +64,11 @@ func (s *wrappedClientStream) RecvMsg(m interface{}) error {
 		if err := waitRetryBackoff(i, s.parentCtx, s.callOpts); err != nil {
 			return err
 		}
-		var ctx context.Context
+		ctx := s.parentCtx
 		var cancel context.CancelFunc
 		if i > 0 && s.callOpts.incHeader {
-			md := utils.ExtractOutgoing(s.parentCtx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
-			ctx = md.ToOutgoing(s.parentCtx)
+			md := utils.ExtractOutgoing(ctx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
+			ctx = md.ToOutgoing(ctx)
 		}
 		if s.callOpts.timeout != 0 {
 			ctx, cancel = context.WithTimeout(ctx, s.callOpts.timeout)

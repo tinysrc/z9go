@@ -25,11 +25,11 @@ func UnaryClientInterceptor(cos ...CallOption) grpc.UnaryClientInterceptor {
 			if err = waitRetryBackoff(i, ctx, callOpts); err != nil {
 				return err
 			}
-			var newCtx context.Context
+			newCtx := ctx
 			var cancel context.CancelFunc
 			if i > 0 && callOpts.incHeader {
 				md := utils.ExtractOutgoing(ctx).Clone().Set(AttemptMetadataKey, strconv.Itoa(int(i)))
-				newCtx = md.ToOutgoing(ctx)
+				newCtx = md.ToOutgoing(newCtx)
 			}
 			if callOpts.timeout != 0 {
 				newCtx, cancel = context.WithTimeout(newCtx, callOpts.timeout)
@@ -77,7 +77,7 @@ func StreamClientInterceptor(cos ...CallOption) grpc.StreamClientInterceptor {
 			if err = waitRetryBackoff(i, ctx, callOpts); err != nil {
 				return nil, err
 			}
-			var newCtx context.Context
+			newCtx := ctx
 			var cancel context.CancelFunc
 			if callOpts.timeout != 0 {
 				newCtx, cancel = context.WithTimeout(newCtx, callOpts.timeout)
