@@ -18,7 +18,9 @@ func init() {
 		mysql.New(mysql.Config{
 			DSN: dsn,
 		}),
-		&gorm.Config{},
+		&gorm.Config{
+			DisableForeignKeyConstraintWhenMigrating: true,
+		},
 	)
 	if err != nil {
 		log.Fatal("mysql open failed", zap.Error(err))
