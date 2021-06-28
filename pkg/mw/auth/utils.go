@@ -20,6 +20,8 @@ func JwtAuth(ctx context.Context, sign string) (context.Context, error) {
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token error=%v", err)
 	}
-	tags.Extract(ctx).Set("userid", claims.Userid)
+	tags := tags.Extract(ctx)
+	tags.Set("userid", claims.Userid)
+	tags.Set("orgid", claims.Orgid)
 	return ctx, nil
 }

@@ -16,6 +16,7 @@ var (
 // CustomClaims struct
 type CustomClaims struct {
 	Userid string
+	Orgid  string
 	jwt.StandardClaims
 }
 
