@@ -16,6 +16,7 @@ type Module interface {
 
 type ModuleManager struct {
 	modules []Module
+	wg      sync.WaitGroup
 }
 
 func NewModuleManager() *ModuleManager {
@@ -36,25 +37,28 @@ func (m *ModuleManager) Init() error {
 			return fmt.Errorf("module manager init failed module=%v error=%v", mod, err)
 		}
 	}
+	m.wg.Add(len(m.modules))
 	return nil
 }
 
 func (m *ModuleManager) Run() {
 	for i := 0; i < len(m.modules); i++ {
-		m.modules[i].Run()
+		mod := m.modules[i]
+		go func() {
+			mod.Run()
+			m.wg.Done()
+		}()
 	}
 }
 
 func (m *ModuleManager) Stop() {
-	var wg sync.WaitGroup
 	for i := 0; i < len(m.modules); i++ {
-		wg.Add(1)
-		go func(mod Module) {
+		mod := m.modules[i]
+		go func() {
 			mod.Stop()
-			wg.Done()
-		}(m.modules[i])
+		}()
 	}
-	wg.Wait()
+	m.wg.Wait()
 }
 
 func WaitExit() {
